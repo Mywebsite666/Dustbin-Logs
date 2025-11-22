@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elegant Waste Management Dashboard</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Updated Theme: Elegant White/Deep Teal */
+        :root {
+            --primary-color: #006064; /* Deep Teal - Accent */
+            --secondary-color: #D4AF37; /* Muted Gold - Secondary Accent */
+            --bg-dark: #F8F8F8; /* Main Light Background */
+            --bg-light: #FFFFFF; /* Card White Background */
+            --text-dark: #1F2937; /* Dark Gray/Black Text */
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-dark); 
+            color: var(--text-dark); 
+        }
+        
+        /* Glassmorphism Effect for Header */
+        .glass {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px); /* For Safari support */
+        }
+
+        /* Style for the active navigation tab with subtle shadow */
+        .nav-active {
+            background-color: var(--primary-color) !important;
+            color: var(--bg-light) !important; 
+            box-shadow: 0 4px 15px -5px rgba(0, 96, 100, 0.5); /* Teal Glow/Shadow */
+        }
+        /* Custom scrollbar for a clean look */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00838f; }
+
+        /* Custom Table Styling for the new theme */
+        #dustbinTable thead th {
+            background-color: #E0E0E0; /* Light Gray Header */
+            color: var(--primary-color);
+        }
+        #dustbinTable tbody tr:hover {
+            background-color: #F0F0F0; /* Very light hover shade */
+        }
+        .card-hover {
+            transition: all 0.3s ease-in-out;
+        }
+        .card-hover:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            transform: translateY(-3px);
+        }
+        
+        /* Style for the Refresh Button to ensure contrast */
+        #refreshButton {
+            color: var(--secondary-color); 
+            transition: color 0.2s ease-in-out;
+        }
+        #refreshButton:hover:not(:disabled) {
+            color: #C0A130; /* Darker Gold on hover */
+        }
+        
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div id="app" class="flex flex-col min-h-screen">
+
+        <!-- Header and Navigation - Updated for Mobile Responsiveness -->
+        <header class="sticky top-0 z-50 bg-white/80 shadow-lg border-b border-primary-color/10 glass">
+            <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between">
+                <h1 class="text-3xl font-extrabold text-text-dark tracking-wider mb-2 md:mb-0">
+                    <span class="text-primary-color">Waste</span>Flow Monitor
+                </h1>
+                
+                <!-- Responsiveness Improvement: Added flex-wrap for nav buttons -->
+                <nav class="flex flex-wrap justify-center md:justify-end space-x-2 md:space-x-4 pt-2 md:pt-0">
+                    <button id="navDashboard" onclick="showView('dashboard')" class="nav-btn px-3 py-2 md:px-5 md:py-2 text-sm md:text-base font-semibold rounded-lg transition duration-300 bg-gray-100 hover:bg-gray-200 text-gray-700 mb-2">
+                        <svg class="w-5 h-5 inline mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 4h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        Dashboard
+                    </button>
+                    <button id="navNews" onclick="showView('news')" class="nav-btn px-3 py-2 md:px-5 md:py-2 text-sm md:text-base font-semibold rounded-lg transition duration-300 bg-gray-100 hover:bg-gray-200 text-gray-700 mb-2">
+                        <svg class="w-5 h-5 inline mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 2l-2 2m-2 2l-2 2m-2-2l2-2m2-2l2-2m-2-2l2 2m-2 2l2 2"></path></svg>
+                        City News
+                    </button>
+                    <button id="navAwareness" onclick="showView('awareness')" class="nav-btn px-3 py-2 md:px-5 md:py-2 text-sm md:text-base font-semibold rounded-lg transition duration-300 bg-gray-100 hover:bg-gray-200 text-gray-700 mb-2">
+                        <svg class="w-5 h-5 inline mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 20h.01m-6.663-12h17.336a1 1 0 010 2h-17.336a1 1 0 010-2zM4 12h16m-7 4h-2a2 2 0 01-2-2V6a2 2 0 012-2h2a2 2 0 012 2v8a2 2 0 01-2 2z"></path></svg>
+                        Awareness
+                    </button>
+                    <button id="navTech" onclick="showView('tech')" class="nav-btn px-3 py-2 md:px-5 md:py-2 text-sm md:text-base font-semibold rounded-lg transition duration-300 bg-gray-100 hover:bg-gray-200 text-gray-700 mb-2">
+                        <svg class="w-5 h-5 inline mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1l-.75-3M3 13h18M5.25 17h13.5C19.89 17 21 15.89 21 14.5v-10C21 3.11 19.89 2 18.5 2h-13C3.11 2 2 3.11 2 4.5v10C2 15.89 3.11 17 4.5 17z"></path></svg>
+                        Technology
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow container mx-auto px-4 py-8">
+
+            <!-- 1. Dashboard View (Active Data) -->
+            <section id="dashboardView" class="view-content hidden">
+                <!-- Header and Refresh Button -->
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl md:text-3xl font-bold text-primary-color">Dustbin Usage Log</h2>
+                    <!-- Refresh Button: Text color changed to secondary (Gold) for contrast -->
+                    <button id="refreshButton" onclick="fetchAndRenderData()" 
+                            class="px-5 py-2 text-sm font-semibold rounded-full transition duration-300 bg-primary-color 
+                                   hover:bg-[#004d51] shadow-md hover:shadow-lg flex items-center 
+                                   disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg id="refreshIcon" class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 0020 13a8.001 8.001 0 00-4.004-6.916L12 11V4l-7 7.004"></path></svg>
+                        <span id="refreshText">Refresh Data</span>
+                    </button>
+                </div>
+                <!-- Horizontal Rule to separate header from content -->
+                <div class="border-b-2 border-primary-color/50 mb-6"></div>
+                
+                <div class="bg-bg-light p-6 rounded-xl shadow-lg border border-gray-100 card-hover">
+                    <p id="loadingIndicator" class="text-lg text-center py-8 text-secondary-color">
+                        <svg class="animate-spin h-5 w-5 mr-3 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                        Loading real-time usage data...
+                    </p>
+                    <div id="errorBox" class="hidden bg-red-100 border border-red-500 p-4 rounded-lg mb-4" role="alert">
+                        <p class="font-bold text-red-700">Data Error</p>
+                        <p id="errorMessage" class="text-red-600"></p>
+                    </div>
+
+                    <!-- Table container ensures horizontal scrolling on mobile if needed -->
+                    <div class="overflow-x-auto">
+                        <table id="dustbinTable" class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-primary-color rounded-tl-xl">Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-primary-color">Time</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-primary-color">Location (Lat/Lon)</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-primary-color rounded-tr-xl">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200" id="dustbinTableBody">
+                                <!-- Data rows will be injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. City News View -->
+            <section id="newsView" class="view-content hidden">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6 text-primary-color border-b-2 border-primary-color/50 pb-2">Latest Municipal & Environmental News</h2>
+                <!-- News grid defaults to 1 column on mobile, 2 on medium, 3 on large -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    <!-- News Card 1 -->
+                    <div class="bg-bg-light p-6 rounded-xl shadow-lg border border-secondary-color/30 hover:border-secondary-color transition duration-300 card-hover">
+                        <div class="rounded-lg overflow-hidden mb-4">
+                            <img src="https://placehold.co/400x200/006064/FFFFFF?text=Smart+City+Skyline" alt="Smart City Skyline Placeholder" class="w-full h-auto object-cover rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/400x200/CCCCCC/333333?text=Image+Unavailable';" />
+                        </div>
+                        <p class="text-xs font-medium text-secondary-color mb-2">2025-11-20</p>
+                        <h3 class="text-xl font-bold mb-3 text-gray-900">Smart City Project Phase II Launched</h3>
+                        <p class="text-gray-600 text-sm">The municipal corporation announced the successful launch of 500 new Smart Dustbins in the Central Zone, aiming for a 15% improvement in daily waste collection efficiency by year-end. Public cooperation is essential.</p>
+                        <a href="#" class="mt-4 inline-block text-primary-color hover:text-secondary-color font-semibold">Read More &rarr;</a>
+                    </div>
+
+                    <!-- News Card 2 -->
+                    <div class="bg-bg-light p-6 rounded-xl shadow-lg border border-secondary-color/30 hover:border-secondary-color transition duration-300 card-hover">
+                        <div class="rounded-lg overflow-hidden mb-4">
+                            <img src="https://placehold.co/400x200/D4AF37/1F2937?text=Recycling+Bins" alt="Recycling Bins Placeholder" class="w-full h-auto object-cover rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/400x200/CCCCCC/333333?text=Image+Unavailable';" />
+                        </div>
+                        <p class="text-xs font-medium text-secondary-color mb-2">2025-11-18</p>
+                        <h3 class="text-xl font-bold mb-3 text-gray-900">New Recycling Policy for Residential Areas</h3>
+                        <p class="text-gray-600 text-sm">A mandatory two-bin system is being introduced to increase the separation of wet and dry waste at the source. Fines will be enforced starting next quarter to ensure compliance.</p>
+                        <a href="#" class="mt-4 inline-block text-primary-color hover:text-secondary-color font-semibold">Read More &rarr;</a>
+                    </div>
+
+                    <!-- News Card 3 -->
+                    <div class="bg-bg-light p-6 rounded-xl shadow-lg border border-secondary-color/30 hover:border-secondary-color transition duration-300 card-hover">
+                        <div class="rounded-lg overflow-hidden mb-4">
+                            <img src="https://placehold.co/400x200/006064/FFFFFF?text=Community+Clean-Up" alt="Community Clean-Up Placeholder" class="w-full h-auto object-cover rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/400x200/CCCCCC/333333?text=Image+Unavailable';" />
+                        </div>
+                        <p class="text-xs font-medium text-secondary-color mb-2">2025-11-15</p>
+                        <h3 class="text-xl font-bold mb-3 text-gray-900">Community Clean-Up Drive Success</h3>
+                        <p class="text-gray-600 text-sm">Over 300 volunteers participated in the weekend clean-up initiative across 12 wards, collecting an estimated 3 tons of litter. Special recognition was given to the most active zones.</p>
+                        <a href="#" class="mt-4 inline-block text-primary-color hover:text-secondary-color font-semibold">Read More &rarr;</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Awareness View (Importance of Clean and Healthy) -->
+            <section id="awarenessView" class="view-content hidden">
+                <h2 class="text-2xl md:text-3xl font-bold mb-8 text-primary-color border-b-2 border-primary-color/50 pb-2">The Importance of Clean & Healthy Communities</h2>
+                
+                <div class="space-y-8">
+                    
+                    <!-- Health Benefit Card: stacks on mobile, side-by-side on md+ -->
+                    <div class="bg-bg-light p-8 rounded-xl shadow-lg border-l-4 border-secondary-color flex flex-col md:flex-row items-start border-primary-color/30 card-hover">
+                        <div class="text-secondary-color flex-shrink-0 mb-4 md:mb-0 md:mr-6">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.462-.057-.916-.168-1.353"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Improved Public Health</h3>
+                            <p class="text-gray-600">Unmanaged waste is a breeding ground for pests and disease-carrying vectors like mosquitos and rodents. By using smart disposal methods, we drastically cut down on sanitation risks, leading to lower rates of infectious diseases and a healthier urban environment for everyone.</p>
+                            <div class="mt-4 w-full md:w-2/3">
+                                <img src="https://placehold.co/300x150/006064/FFFFFF?text=Clean+Urban+Park" alt="Clean Park Placeholder" class="w-full h-auto object-cover rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/300x150/CCCCCC/333333?text=Image+Unavailable';" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Economic Benefit Card: stacks on mobile, side-by-side on md+ -->
+                    <div class="bg-bg-light p-8 rounded-xl shadow-lg border-l-4 border-primary-color flex flex-col md:flex-row items-start border-primary-color/30 card-hover">
+                        <div class="text-primary-color flex-shrink-0 mb-4 md:mb-0 md:mr-6">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m4 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Sustainable Economic Growth</h3>
+                            <p class="text-gray-600">Efficient waste management reduces municipal overhead costs for collection and disposal. Furthermore, a clean city attracts tourism and investment, creating a more prosperous and enjoyable living space for residents. Recycling efforts also contribute directly to circular economy jobs.</p>
+                            <div class="mt-4 w-full md:w-2/3">
+                                <img src="https://placehold.co/300x150/D4AF37/1F2937?text=Sorting+Recyclables" alt="Recyclables Sorting Placeholder" class="w-full h-auto object-cover rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/300x150/CCCCCC/333333?text=Image+Unavailable';" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 4. Technology View -->
+            <section id="techView" class="view-content hidden">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6 text-primary-color border-b-2 border-primary-color/50 pb-2">Integrated Smart Dustbin Technology</h2>
+                
+                <div class="bg-bg-light p-8 rounded-xl shadow-lg border border-gray-100 card-hover space-y-8">
+                    
+                    <p class="text-gray-700">The data displayed on this dashboard is collected by an intelligent unit housed within each smart dustbin. This unit consists of several key components working together to transmit real-time location and fill-level information.</p>
+                    
+                    <!-- Tech grid defaults to 1 column on mobile, 2 on medium -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        
+                        <!-- Component 1: Raspberry Pi 3B -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-secondary-color/20 shadow-sm">
+                            <h3 class="text-xl font-bold text-primary-color mb-2 flex items-center">
+                                <span class="mr-2">Microcontroller (Brain):</span> Raspberry Pi 3B
+                            </h3>
+                            <p class="text-gray-700 text-sm">This is the central processing unit of the smart dustbin. It runs the control logic, reads sensor data, computes the fill level, and handles communication (Wi-Fi/cellular) to send the data packet (Date, Time, Lat, Lon, Fill-Level) to the cloud spreadsheet/database.</p>
+                            <div class="mt-4 w-full h-auto">
+                                <img src="https://placehold.co/300x150/006064/FFFFFF?text=Raspberry+Pi+3B" alt="Raspberry Pi 3B Placeholder" class="w-full h-auto object-cover rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/300x150/CCCCCC/333333?text=Image+Unavailable';" />
+                            </div>
+                        </div>
+
+                        <!-- Component 2: NEO-6M GPS Module -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-secondary-color/20 shadow-sm">
+                            <h3 class="text-xl font-bold text-primary-color mb-2 flex items-center">
+                                <span class="mr-2">Location Tracker:</span> NEO-6M GPS Module
+                            </h3>
+                            <p class="text-gray-700 text-sm">The NEO-6M module provides high-precision location data (Latitude and Longitude) for each dustbin. This information is crucial for municipal fleets to efficiently plan collection routes and view the exact point of usage on a map.</p>
+                            <div class="mt-4 w-full h-auto">
+                                <img src="https://placehold.co/300x150/D4AF37/1F2937?text=NEO-6M+GPS+Module" alt="NEO-6M GPS Module Placeholder" class="w-full h-auto object-cover rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/300x150/CCCCCC/333333?text=Image+Unavailable';" />
+                            </div>
+                        </div>
+
+                        <!-- Component 3: Ultrasonic Sensor -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-secondary-color/20 shadow-sm">
+                            <h3 class="text-xl font-bold text-primary-color mb-2 flex items-center">
+                                <span class="mr-2">Fill-Level Monitor:</span> HC-SR04 Ultrasonic Sensor
+                            </h3>
+                            <p class="text-gray-700 text-sm">This sensor measures the distance from the sensor (mounted on the lid's underside) to the trash surface. By comparing this distance to the dustbin's total height, the Raspberry Pi calculates the percentage fill level, triggering an alert when full.</p>
+                            <div class="mt-4 w-full h-auto">
+                                <img src="https://placehold.co/300x150/006064/FFFFFF?text=HC-SR04+Sensor" alt="HC-SR04 Ultrasonic Sensor Placeholder" class="w-full h-auto object-cover rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/300x150/CCCCCC/333333?text=Image+Unavailable';" />
+                            </div>
+                        </div>
+
+                        <!-- Component 4: Servo Motor -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-secondary-color/20 shadow-sm">
+                            <h3 class="text-xl font-bold text-primary-color mb-2 flex items-center">
+                                <span class="mr-2">Lid Control:</span> Servo Motor
+                            </h3>
+                            <p class="text-gray-700 text-sm">A small servo motor is used to automate the dustbin lid. It can be programmed to open automatically upon sensing a user approach (via an IR sensor or similar, often used with the ultrasonic sensor), reducing physical contact and improving hygiene.</p>
+                            <div class="mt-4 w-full h-auto">
+                                <img src="https://placehold.co/300x150/D4AF37/1F2937?text=Micro+Servo+Motor" alt="Servo Motor Placeholder" class="w-full h-auto object-cover rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/300x150/CCCCCC/333333?text=Image+Unavailable';" />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-8 py-4 bg-bg-light border-t border-primary-color/10">
+            <div class="container mx-auto px-4 text-center text-sm text-gray-500">
+                &copy; 2025 Municipal Corporation. Powered by Smart Waste Technologies.
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- JavaScript for Functionality -->
+    <script>
+        // --- Configuration ---
+        // Placeholder CSV URL for demonstration purposes.
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/1ss8c0a9NZ1bGvUqUsVZCyZLBbM4SWXdKCraU60a1SlU/export?format=csv';
+
+        // --- View Switching Logic ---
+        const views = {
+            dashboard: { element: document.getElementById('dashboardView'), nav: document.getElementById('navDashboard') },
+            news: { element: document.getElementById('newsView'), nav: document.getElementById('navNews') },
+            awareness: { element: document.getElementById('awarenessView'), nav: document.getElementById('navAwareness') },
+            tech: { element: document.getElementById('techView'), nav: document.getElementById('navTech') }
+        };
+
+        function showView(viewId) {
+            // Hide all views and deactivate all buttons
+            Object.values(views).forEach(v => {
+                v.element.classList.add('hidden');
+                v.nav.classList.remove('nav-active');
+                // Use light theme non-active styles
+                v.nav.classList.add('bg-gray-100', 'hover:bg-gray-200', 'text-gray-700'); 
+            });
+
+            // Show the target view and activate its button
+            const targetView = views[viewId];
+            if (targetView) {
+                targetView.element.classList.remove('hidden');
+                targetView.nav.classList.add('nav-active');
+                targetView.nav.classList.remove('bg-gray-100', 'hover:bg-gray-200', 'text-gray-700');
+            }
+        }
+
+        // --- Data Fetching and Rendering ---
+        async function fetchAndRenderData() {
+            const tableBody = document.getElementById('dustbinTableBody');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const errorBox = document.getElementById('errorBox');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Get button elements
+            const refreshButton = document.getElementById('refreshButton');
+            const refreshIcon = document.getElementById('refreshIcon');
+            const refreshText = document.getElementById('refreshText');
+
+
+            // 1. Set Button Loading State
+            if (refreshButton) {
+                refreshButton.disabled = true;
+                refreshIcon.classList.add('animate-spin');
+                refreshText.textContent = 'Loading...';
+            }
+
+            // Clear previous data for a fresh load
+            tableBody.innerHTML = '';
+            // Show global indicator only if no data is present yet
+            if (tableBody.children.length === 0) {
+                loadingIndicator.classList.remove('hidden');
+            }
+            errorBox.classList.add('hidden');
+
+
+            try {
+                // Implementing simple exponential backoff for robustness
+                const MAX_RETRIES = 3;
+                let response;
+                
+                for (let i = 0; i < MAX_RETRIES; i++) {
+                    response = await fetch(csvUrl);
+                    if (response.ok) break;
+                    // Wait before retrying
+                    if (i < MAX_RETRIES - 1) await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+                }
+
+                if (!response || !response.ok) {
+                    throw new Error(`HTTP error! status: ${response ? response.status : 'Unknown'}`);
+                }
+                
+                const text = await response.text();
+                
+                const rows = text.trim().split('\n');
+                if (rows.length < 2) {
+                    throw new Error("No data or invalid CSV format received.");
+                }
+
+                // Get headers and remove them from the data rows
+                const headers = rows.shift().split(',').map(h => h.trim());
+                
+                // Process the data
+                // Show last 15 entries for a real-time feel, skipping the header.
+                const dataRows = rows.slice(1).reverse().slice(0, 15); 
+                
+                dataRows.forEach(rowText => { 
+                    const cols = rowText.split(',');
+                    const rowData = {};
+                    headers.forEach((h, i) => rowData[h] = cols[i]?.trim() || '');
+                    
+                    // Destructure and format data
+                    const date = rowData['Date'] || 'N/A';
+                    const time = rowData['Time'] || 'N/A';
+                    const lat = parseFloat(rowData['Latitude']);
+                    const lon = parseFloat(rowData['Longitude']);
+                    const locationText = (isNaN(lat) || isNaN(lon)) ? 'Location Unknown' : `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+
+                    const tr = document.createElement('tr');
+                    // Use light theme table row styling
+                    tr.className = 'bg-bg-light hover:bg-[#F0F0F0] transition duration-150 border-b border-gray-200';
+
+                    // Date
+                    tr.innerHTML += `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">${date}</td>`;
+                    
+                    // Time
+                    tr.innerHTML += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${time}</td>`;
+                    
+                    // Location (Lat/Lon)
+                    tr.innerHTML += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${locationText}</td>`;
+
+                    // Map Link (Action)
+                    if (!isNaN(lat) && !isNaN(lon)) {
+                        const mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+                        tr.innerHTML += `
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                <a href="${mapLink}" target="_blank" class="text-primary-color hover:text-secondary-color font-bold transition duration-150">
+                                    View Map &rarr;
+                                </a>
+                            </td>
+                        `;
+                    } else {
+                        tr.innerHTML += `<td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">No Coordinates</td>`;
+                    }
+                    
+                    tableBody.appendChild(tr);
+                });
+
+            } catch (err) {
+                console.error('Data Fetch Error:', err);
+                errorMessage.textContent = `Could not load data from the specified URL. Please ensure the Google Sheet is public and the CSV link is correct. Details: ${err.message}`;
+                errorBox.classList.remove('hidden');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                
+                // 2. Reset Button State
+                if (refreshButton) {
+                    refreshButton.disabled = false;
+                    refreshIcon.classList.remove('animate-spin');
+                    refreshText.textContent = 'Refresh Data';
+                }
+            }
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set the initial view to Dashboard
+            showView('dashboard');
+            // Initial fetch of the data
+            fetchAndRenderData();
+        });
+    </script>
+
+</body>
+</html>
